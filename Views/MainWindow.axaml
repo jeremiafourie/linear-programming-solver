@@ -1,20 +1,181 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:linear_programming_solver.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:uc="using:linear_programming_solver.Views.UserControls"
         x:Class="linear_programming_solver.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="linear_programming_solver">
+        Title="{Binding WindowTitle}"
+        Width="1200" Height="800">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+    <Window.DataTemplates>
+        <DataTemplate DataType="vm:WelcomeViewModel">
+            <uc:WelcomeView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:ProblemEditorViewModel">
+            <uc:ProblemEditorView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:SolutionTableViewModel">
+            <uc:SolutionTableView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:TableauIterationsViewModel">
+            <uc:TableauIterationsView />
+        </DataTemplate>
+    </Window.DataTemplates>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <DockPanel>
+        
+        <!-- Menu Bar -->
+        <Menu DockPanel.Dock="Top">
+            
+            <!-- File Menu -->
+            <MenuItem Header="_File">
+                <MenuItem Header="_New Problem" 
+                         Command="{Binding NewProblemCommand}"
+                         InputGesture="Ctrl+N" />
+                
+                <MenuItem Header="_Open Problem..." 
+                         Command="{Binding OpenProblemCommand}"
+                         InputGesture="Ctrl+O" />
+                
+                <Separator />
+                
+                <MenuItem Header="_Save Problem" 
+                         Command="{Binding SaveProblemCommand}"
+                         InputGesture="Ctrl+S" />
+                
+                <MenuItem Header="Save Problem _As..." 
+                         Command="{Binding SaveProblemAsCommand}"
+                         InputGesture="Ctrl+Shift+S" />
+                
+                <Separator />
+                
+                <MenuItem Header="_Export Results..." 
+                         Command="{Binding ExportResultsCommand}" />
+                
+                <Separator />
+                
+                <MenuItem Header="E_xit" 
+                         Command="{Binding ExitCommand}"
+                         InputGesture="Alt+F4" />
+            </MenuItem>
 
+            <!-- Algorithm Menu -->
+            <MenuItem Header="_Algorithm">
+                <MenuItem Header="Select Algorithm">
+                    <MenuItem Header="● Primal Simplex" 
+                             Command="{Binding SelectPrimalSimplexCommand}" />
+                    <MenuItem Header="○ Revised Primal Simplex" 
+                             Command="{Binding SelectRevisedPrimalSimplexCommand}" />
+                    <MenuItem Header="○ Branch &amp; Bound Simplex" 
+                             Command="{Binding SelectBranchAndBoundSimplexCommand}" />
+                    <MenuItem Header="○ Cutting Plane" 
+                             Command="{Binding SelectCuttingPlaneCommand}" />
+                    <MenuItem Header="○ Branch &amp; Bound Knapsack" 
+                             Command="{Binding SelectBranchAndBoundKnapsackCommand}" />
+                </MenuItem>
+                
+                <Separator />
+                
+                <MenuItem Header="_Solve Problem" 
+                         Command="{Binding SolveProblemCommand}"
+                         InputGesture="F5" />
+                
+                <MenuItem Header="Solve _Configuration..." 
+                         Command="{Binding SolveConfigurationCommand}" />
+                
+                <MenuItem Header="_View Solution Details" 
+                         Command="{Binding ViewSolutionDetailsCommand}" />
+            </MenuItem>
+
+            <!-- Analysis Menu -->
+            <MenuItem Header="_Analysis">
+                <MenuItem Header="Variable Analysis">
+                    <MenuItem Header="Non-Basic Variable Range..." 
+                             Command="{Binding NonBasicVariableRangeCommand}" />
+                    <MenuItem Header="Apply Non-Basic Variable Change..." 
+                             Command="{Binding ApplyNonBasicVariableCommand}" />
+                    <MenuItem Header="Basic Variable Range..." 
+                             Command="{Binding BasicVariableRangeCommand}" />
+                    <MenuItem Header="Apply Basic Variable Change..." 
+                             Command="{Binding ApplyBasicVariableCommand}" />
+                </MenuItem>
+                
+                <MenuItem Header="Constraint Analysis">
+                    <MenuItem Header="RHS Value Range..." 
+                             Command="{Binding RhsValueRangeCommand}" />
+                    <MenuItem Header="Apply RHS Change..." 
+                             Command="{Binding ApplyRhsChangeCommand}" />
+                    <MenuItem Header="Non-Basic Column Range..." 
+                             Command="{Binding NonBasicColumnRangeCommand}" />
+                    <MenuItem Header="Apply Column Change..." 
+                             Command="{Binding ApplyColumnChangeCommand}" />
+                </MenuItem>
+                
+                <MenuItem Header="Model Modification">
+                    <MenuItem Header="Add New Activity..." 
+                             Command="{Binding AddNewActivityCommand}" />
+                    <MenuItem Header="Add New Constraint..." 
+                             Command="{Binding AddNewConstraintCommand}" />
+                </MenuItem>
+                
+                <Separator />
+                
+                <MenuItem Header="_Shadow Prices" 
+                         Command="{Binding ShadowPricesCommand}" />
+                
+                <Separator />
+                
+                <MenuItem Header="Duality">
+                    <MenuItem Header="Generate Dual Problem" 
+                             Command="{Binding GenerateDualProblemCommand}" />
+                    <MenuItem Header="Solve Dual Problem" 
+                             Command="{Binding SolveDualProblemCommand}" />
+                    <MenuItem Header="Verify Duality Type" 
+                             Command="{Binding VerifyDualityTypeCommand}" />
+                </MenuItem>
+            </MenuItem>
+
+            <!-- View Menu -->
+            <MenuItem Header="_View">
+                <MenuItem Header="_Solution Table" 
+                         Command="{Binding SolutionTableCommand}"
+                         InputGesture="Ctrl+1" />
+                
+                <MenuItem Header="_Tableau Iterations" 
+                         Command="{Binding TableauIterationsCommand}"
+                         InputGesture="Ctrl+2" />
+                
+                <MenuItem Header="_Canonical Form" 
+                         Command="{Binding CanonicalFormCommand}"
+                         InputGesture="Ctrl+3" />
+                
+                <Separator />
+                
+                <MenuItem Header="_Full Screen" 
+                         Command="{Binding FullScreenCommand}"
+                         InputGesture="F11" />
+                
+                <MenuItem Header="Status _Bar" 
+                         Command="{Binding StatusBarCommand}" />
+            </MenuItem>
+
+            <!-- Help Menu -->
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" />
+            </MenuItem>
+        </Menu>
+
+        <!-- Status Bar -->
+        <Border DockPanel.Dock="Bottom" 
+                Background="LightGray" 
+                BorderBrush="Gray" 
+                BorderThickness="0,1,0,0" 
+                Padding="10,5">
+            <TextBlock Text="{Binding StatusMessage}" />
+        </Border>
+
+        <!-- Dynamic Content -->
+        <ContentControl Content="{Binding CurrentViewModel}" />
+        
+    </DockPanel>
 </Window>

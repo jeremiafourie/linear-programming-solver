@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:linear_programming_solver.ViewModels"
+             x:Class="linear_programming_solver.Views.UserControls.WelcomeView"
+             x:DataType="vm:WelcomeViewModel">
+    
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30">
+        <TextBlock Text="Linear Programming Solver" 
+                   FontSize="28" 
+                   FontWeight="Bold" 
+                   HorizontalAlignment="Center" />
+        
+        <TextBlock Text="Welcome! Get started by creating a new problem or opening an existing one." 
+                   FontSize="16" 
+                   HorizontalAlignment="Center"
+                   Foreground="Gray" />
+        
+        <StackPanel Orientation="Horizontal" 
+                    HorizontalAlignment="Center" 
+                    Spacing="15">
+            <Button Content="New Problem" 
+                    Command="{Binding NewProblemCommand}" 
+                    Padding="25,12"
+                    FontSize="14" />
+            <Button Content="Open Problem" 
+                    Command="{Binding OpenProblemCommand}" 
+                    Padding="25,12"
+                    FontSize="14" />
+        </StackPanel>
+        
+        <TextBlock Text="Use the menu above to access all solver features" 
+                   FontSize="12" 
+                   HorizontalAlignment="Center"
+                   Foreground="Gray"
+                   FontStyle="Italic" />
+    </StackPanel>
+</UserControl>

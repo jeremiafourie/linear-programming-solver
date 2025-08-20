@@ -1,0 +1,94 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:linear_programming_solver.ViewModels"
+             x:Class="linear_programming_solver.Views.UserControls.TableauIterationsView"
+             x:DataType="vm:TableauIterationsViewModel">
+    
+    <DockPanel Margin="20">
+        <!-- Toolbar -->
+        <Border DockPanel.Dock="Top" 
+                BorderBrush="Gray" 
+                BorderThickness="0,0,0,1" 
+                Padding="0,0,0,10" 
+                Margin="0,0,0,20">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Content="◀◀ First" 
+                       Command="{Binding JumpToFirstCommand}" 
+                       Padding="15,8"
+                       IsEnabled="{Binding CanGoPrevious}" />
+                <Button Content="◀ Previous" 
+                       Command="{Binding PreviousIterationCommand}" 
+                       Padding="15,8"
+                       IsEnabled="{Binding CanGoPrevious}" />
+                <Button Content="Next ▶" 
+                       Command="{Binding NextIterationCommand}" 
+                       Padding="15,8"
+                       IsEnabled="{Binding CanGoNext}" />
+                <Button Content="Final ▶▶" 
+                       Command="{Binding JumpToFinalCommand}" 
+                       Padding="15,8"
+                       IsEnabled="{Binding CanGoNext}" />
+                
+                <Separator />
+                
+                <TextBlock Text="{Binding CurrentIteration, StringFormat='Iteration: {0}'}" 
+                          VerticalAlignment="Center"
+                          FontWeight="Bold" />
+                <TextBlock Text="{Binding TotalIterations, StringFormat='of {0}'}" 
+                          VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
+        
+        <!-- Content -->
+        <ScrollViewer>
+            <StackPanel Spacing="25">
+                <TextBlock Text="Tableau Iterations" 
+                          FontSize="22" 
+                          FontWeight="Bold" />
+                
+                <!-- Current Iteration Display -->
+                <Border BorderBrush="DarkGreen" 
+                        BorderThickness="2" 
+                        Padding="20"
+                        Background="LightGreen">
+                    <StackPanel Spacing="15">
+                        <TextBlock Text="{Binding CurrentIteration, StringFormat='Iteration {0}:'}" 
+                                  FontWeight="Bold" 
+                                  FontSize="16" />
+                        
+                        <Border Background="White" 
+                               BorderBrush="Gray" 
+                               BorderThickness="1" 
+                               Padding="15">
+                            <TextBlock Text="{Binding TableauDisplay}" 
+                                      FontFamily="Consolas,Monaco,monospace" 
+                                      FontSize="11"
+                                      Foreground="Black" />
+                        </Border>
+                        
+                        <TextBlock Text="{Binding PivotInfo}" 
+                                  FontWeight="Bold" 
+                                  FontSize="12"
+                                  Foreground="DarkBlue" />
+                    </StackPanel>
+                </Border>
+                
+                <!-- Iteration List -->
+                <StackPanel Spacing="10">
+                    <TextBlock Text="All Iterations" 
+                              FontWeight="Bold" 
+                              FontSize="16" />
+                    <ListBox ItemsSource="{Binding Iterations}"
+                            SelectedIndex="{Binding CurrentIteration}"
+                            Height="150">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding .}" Padding="5" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

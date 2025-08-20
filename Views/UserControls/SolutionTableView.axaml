@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:linear_programming_solver.ViewModels"
+             x:Class="linear_programming_solver.Views.UserControls.SolutionTableView"
+             x:DataType="vm:SolutionTableViewModel">
+    
+    <DockPanel Margin="20">
+        <!-- Toolbar -->
+        <Border DockPanel.Dock="Top" 
+                BorderBrush="Gray" 
+                BorderThickness="0,0,0,1" 
+                Padding="0,0,0,10" 
+                Margin="0,0,0,20">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Content="Export Solution" 
+                       Command="{Binding ExportSolutionCommand}" 
+                       Padding="15,8" />
+                <Button Content="Refresh" 
+                       Command="{Binding RefreshSolutionCommand}" 
+                       Padding="15,8" />
+            </StackPanel>
+        </Border>
+        
+        <!-- Content -->
+        <ScrollViewer>
+            <StackPanel Spacing="25">
+                <TextBlock Text="Solution Table" 
+                          FontSize="22" 
+                          FontWeight="Bold" />
+                
+                <!-- Solution Summary -->
+                <Border BorderBrush="DarkBlue" 
+                        BorderThickness="2" 
+                        Padding="20"
+                        Background="AliceBlue">
+                    <StackPanel Spacing="15">
+                        <TextBlock Text="Optimal Solution" 
+                                  FontWeight="Bold" 
+                                  FontSize="16" />
+                        
+                        <Grid ColumnDefinitions="200,200,200" 
+                              RowDefinitions="Auto,Auto,Auto,Auto">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Problem Type:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ProblemType}" />
+                            
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Status:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SolutionStatus}" />
+                            
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Objective Value:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ObjectiveValue, StringFormat=F3}" />
+                            
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Algorithm Used:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding AlgorithmUsed}" />
+                            
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Iterations:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Iterations}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

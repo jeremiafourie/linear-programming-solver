@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:linear_programming_solver.ViewModels"
+             x:Class="linear_programming_solver.Views.UserControls.ProblemEditorView"
+             x:DataType="vm:ProblemEditorViewModel">
+    
+    <DockPanel Margin="20">
+        <!-- Toolbar -->
+        <Border DockPanel.Dock="Top" 
+                BorderBrush="Gray" 
+                BorderThickness="0,0,0,1" 
+                Padding="0,0,0,10" 
+                Margin="0,0,0,20">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Content="Validate Problem" 
+                       Command="{Binding ValidateProblemCommand}" 
+                       Padding="15,8" />
+                <Button Content="Format Content" 
+                       Command="{Binding FormatContentCommand}" 
+                       Padding="15,8" />
+                <Button Content="Clear Content" 
+                       Command="{Binding ClearContentCommand}" 
+                       Padding="15,8" />
+            </StackPanel>
+        </Border>
+        
+        <!-- Content -->
+        <ScrollViewer>
+            <StackPanel Spacing="15">
+                <TextBlock Text="{Binding CurrentModel.FileName, StringFormat='Problem: {0}'}" 
+                          FontWeight="Bold" 
+                          FontSize="18" />
+                
+                <Border BorderBrush="LightGray" 
+                        BorderThickness="1" 
+                        Padding="15">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Problem Definition" 
+                                  FontWeight="Bold" 
+                                  FontSize="14" />
+                        
+                        <TextBox Text="{Binding CurrentModel.FileContent}" 
+                                AcceptsReturn="True"
+                                TextWrapping="Wrap"
+                                MinHeight="450"
+                                FontFamily="Consolas,Monaco,monospace"
+                                FontSize="12" />
+                        
+                        <TextBlock Text="Format: Line 1: Objective function, Lines 2-n: Constraints, Last line: Variable types"
+                                  FontSize="11"
+                                  Foreground="Gray"
+                                  FontStyle="Italic" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>
