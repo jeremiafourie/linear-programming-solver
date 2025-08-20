@@ -39,6 +39,7 @@
                                   FontWeight="Bold" 
                                   FontSize="14" />
                         
+                        
                         <TextBox Text="{Binding CurrentModel.FileContent}" 
                                 AcceptsReturn="True"
                                 TextWrapping="Wrap"
