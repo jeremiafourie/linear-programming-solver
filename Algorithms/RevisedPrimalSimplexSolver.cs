@@ -291,7 +291,8 @@ public class RevisedPrimalSimplexSolver
             objValue += data.c[data.BasicVariables[i]] * data.BasicSolution[i];
         }
         
-        // Since canonical form negates coefficients for maximization, we need to negate back
+        // For maximization: canonical coefficients are negated, so negate the result
+        // For minimization: coefficients are direct, so use the result as-is  
         solution.ObjectiveValue = problem.IsMaximization ? -objValue : objValue;
     }
 

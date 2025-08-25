@@ -236,11 +236,10 @@ public class PrimalSimplexSolver
         }
         
         // Calculate objective value
-        // The tableau contains the negative of the objective value for maximization problems
-        // due to canonical form conversion
-        solution.ObjectiveValue = problem.IsMaximization ? 
-            -tableau.Matrix[tableau.ConstraintCount, tableau.VariableCount] : 
-            tableau.Matrix[tableau.ConstraintCount, tableau.VariableCount];
+        // The tableau RHS directly contains the objective value in the original sense:
+        // - For maximization: tableau RHS is the maximum value  
+        // - For minimization: tableau RHS is the minimum value
+        solution.ObjectiveValue = tableau.Matrix[tableau.ConstraintCount, tableau.VariableCount];
     }
 
     private IterationData CreateIterationData(SimplexTableau tableau, int iterationNumber, string description)

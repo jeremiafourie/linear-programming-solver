@@ -31,7 +31,7 @@ Z            3.500     1.000     0.000     2.000     3.000     1.000     0.500  
 *** OPTIMAL SOLUTION FOUND ***
 
 OPTIMAL SOLUTION:
-Objective Value: -20.000
+Objective Value: 20.000
 Variable Values:
   x1 = 0.000
   x2 = 0.000
