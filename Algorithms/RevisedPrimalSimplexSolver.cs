@@ -99,7 +99,8 @@ public class RevisedPrimalSimplexSolver
         // Copy objective coefficients and RHS
         for (int j = 0; j < n; j++)
         {
-            data.c[j] = problem.IsMaximization ? problem.ObjectiveCoefficients[j] : -problem.ObjectiveCoefficients[j];
+            // Use the canonical form coefficients directly - they already have correct signs
+            data.c[j] = problem.ObjectiveCoefficients[j];
         }
         
         for (int i = 0; i < m; i++)
@@ -290,7 +291,8 @@ public class RevisedPrimalSimplexSolver
             objValue += data.c[data.BasicVariables[i]] * data.BasicSolution[i];
         }
         
-        solution.ObjectiveValue = problem.IsMaximization ? objValue : -objValue;
+        // Since canonical form negates coefficients for maximization, we need to negate back
+        solution.ObjectiveValue = problem.IsMaximization ? -objValue : objValue;
     }
 
     private IterationData CreateIterationData(RevisedSimplexData data, int iterationNumber, string description)

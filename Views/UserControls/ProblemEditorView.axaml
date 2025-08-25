@@ -11,17 +11,46 @@
                 BorderThickness="0,0,0,1" 
                 Padding="0,0,0,10" 
                 Margin="0,0,0,20">
-            <StackPanel Orientation="Horizontal" Spacing="10">
-                <Button Content="Validate Problem" 
-                       Command="{Binding ValidateProblemCommand}" 
-                       Padding="15,8" />
-                <Button Content="Format Content" 
-                       Command="{Binding FormatContentCommand}" 
-                       Padding="15,8" />
-                <Button Content="Clear Content" 
-                       Command="{Binding ClearContentCommand}" 
-                       Padding="15,8" />
-            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                
+                <!-- Algorithm Selection -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="Algorithm:" 
+                              VerticalAlignment="Center" 
+                              FontWeight="SemiBold" />
+                    <ComboBox ItemsSource="{Binding AvailableAlgorithms}"
+                             SelectedItem="{Binding SelectedAlgorithm}"
+                             DisplayMemberBinding="{Binding DisplayName}"
+                             MinWidth="200"
+                             Padding="8" />
+                </StackPanel>
+                
+                <!-- Action Buttons -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
+                    <Button Content="Save Problem" 
+                           Command="{Binding SaveProblemCommand}" 
+                           Padding="15,8"
+                           Background="DodgerBlue"
+                           Foreground="White" />
+                    <Button Padding="15,8"
+                           Command="{Binding SolveProblemCommand}"
+                           IsEnabled="{Binding CanSolve}"
+                           Background="Green"
+                           Foreground="White">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock Text="Solve Problem" IsVisible="{Binding !IsSolving}" />
+                            <TextBlock Text="Solving..." IsVisible="{Binding IsSolving}" />
+                            <TextBlock Text="●" FontSize="8" IsVisible="{Binding IsSolving}" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
         </Border>
         
         <!-- Content -->

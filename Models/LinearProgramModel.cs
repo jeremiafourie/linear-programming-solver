@@ -1,8 +1,15 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace linear_programming_solver.Models;
 
-public class LinearProgramModel
+public partial class LinearProgramModel : ObservableObject
 {
-    public string FileName { get; set; } = "";
-    public string FileContent { get; set; } = "";
-    public bool IsLoaded { get; set; } = false;
+    [ObservableProperty]
+    private string _fileName = "";
+
+    [ObservableProperty]
+    private string _fileContent = "";
+
+    [ObservableProperty]
+    private bool _isLoaded = false;
 }

@@ -59,8 +59,35 @@ public partial class MainWindowViewModel : ViewModelBase
         TableauIterationsViewModel = new TableauIterationsViewModel();
         CanonicalFormViewModel = new CanonicalFormViewModel();
         
+        // Connect ProblemEditor events
+        ProblemEditorViewModel.SolutionCompleted += OnSolutionCompleted;
+        ProblemEditorViewModel.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(ProblemEditorViewModel.StatusMessage))
+            {
+                StatusMessage = ProblemEditorViewModel.StatusMessage;
+            }
+        };
+        
         // Start with Welcome view
         CurrentViewModel = WelcomeViewModel;
+    }
+
+    private void OnSolutionCompleted(SolutionResult result)
+    {
+        CurrentSolution = result;
+        
+        if (result.Success)
+        {
+            // Update the selected algorithm to match what was used
+            if (ProblemEditorViewModel.SelectedAlgorithm != null)
+            {
+                SelectedAlgorithm = ProblemEditorViewModel.SelectedAlgorithm.Algorithm;
+            }
+            
+            // Automatically navigate to solution view
+            NavigateToSolutionTable();
+        }
     }
 
     #region Navigation Methods
@@ -73,10 +100,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public void NavigateToProblemEditor()
     {
-        if (CurrentModel.IsLoaded)
-        {
-            ProblemEditorViewModel.LoadProblem(CurrentModel);
-        }
+        // Always sync the current model with the editor
+        ProblemEditorViewModel.LoadProblem(CurrentModel);
         CurrentViewModel = ProblemEditorViewModel;
         StatusMessage = "Problem Editor view";
     }

@@ -104,9 +104,9 @@ public class PrimalSimplexSolver
         // Copy objective coefficients (bottom row)
         for (int j = 0; j < n; j++)
         {
-            // For maximization problems converted to canonical form, coefficients are already negated
-            // For the simplex method, we need to negate them again for the tableau
-            tableau.Matrix[m, j] = problem.IsMaximization ? -problem.ObjectiveCoefficients[j] : problem.ObjectiveCoefficients[j];
+            // The canonical form already has the correct signs for the tableau
+            // No additional negation needed
+            tableau.Matrix[m, j] = problem.ObjectiveCoefficients[j];
         }
         tableau.Matrix[m, n] = 0; // Objective value starts at 0
 
@@ -236,9 +236,11 @@ public class PrimalSimplexSolver
         }
         
         // Calculate objective value
+        // The tableau contains the negative of the objective value for maximization problems
+        // due to canonical form conversion
         solution.ObjectiveValue = problem.IsMaximization ? 
-            -tableau.Matrix[tableau.ConstraintCount, n] : 
-            tableau.Matrix[tableau.ConstraintCount, n];
+            -tableau.Matrix[tableau.ConstraintCount, tableau.VariableCount] : 
+            tableau.Matrix[tableau.ConstraintCount, tableau.VariableCount];
     }
 
     private IterationData CreateIterationData(SimplexTableau tableau, int iterationNumber, string description)

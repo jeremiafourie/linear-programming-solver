@@ -1,0 +1,44 @@
+LINEAR PROGRAMMING SOLVER RESULTS
+Algorithm: Primal Simplex
+Status: Optimal
+
+ORIGINAL PROBLEM:
+Type: Maximization
+Variables: 6
+Constraints: 1
+
+CANONICAL FORM:
+Maximize Z = -2.000x1 -3.000x2 -3.000x3 -5.000x4 -2.000x5 -4.000x6
+Subject to:
+  11.000x1 +8.000x2 +6.000x3 +14.000x4 +10.000x5 +10.000x6 +1.000s1 = 40.000
+  x1, x2, x3, x4, x5, x6, s1 >= 0
+
+SOLUTION ITERATIONS:
+ITERATION 0: Initial tableau
+Basis           x1        x2        x3        x4        x5        x6        x7       RHS
+x7          11.000     8.000     6.000    14.000    10.000    10.000     1.000    40.000
+Z           -2.000    -3.000    -3.000    -5.000    -2.000    -4.000     0.000     0.000
+
+ITERATION 1: Pivot: Enter x4, Leave x7
+Basis           x1        x2        x3        x4        x5        x6        x7       RHS
+x4           0.786     0.571     0.429     1.000     0.714     0.714     0.071     2.857
+Z            1.929    -0.143    -0.857     0.000     1.571    -0.429     0.357    14.286
+
+ITERATION 2: Pivot: Enter x3, Leave x4
+Basis           x1        x2        x3        x4        x5        x6        x7       RHS
+x3           1.833     1.333     1.000     2.333     1.667     1.667     0.167     6.667
+Z            3.500     1.000     0.000     2.000     3.000     1.000     0.500    20.000
+*** OPTIMAL SOLUTION FOUND ***
+
+OPTIMAL SOLUTION:
+Objective Value: -20.000
+Variable Values:
+  x1 = 0.000
+  x2 = 0.000
+  x3 = 6.667
+  x4 = 0.000
+  x5 = 0.000
+  x6 = 0.000
+  s1 = 0.000
+Basic Variables: x3
+Non-Basic Variables: x1, x2, x4, x5, x6, s1
