@@ -1,0 +1,89 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:linear_programming_solver.ViewModels.Dialogs"
+        x:Class="linear_programming_solver.Views.Dialogs.VariableSelectionDialog"
+        x:DataType="vm:VariableSelectionDialogViewModel"
+        Title="{Binding DialogTitle}"
+        Width="450" Height="350"
+        MinWidth="400" MinHeight="300"
+        WindowStartupLocation="CenterOwner"
+        CanResize="false">
+    
+    <DockPanel Margin="20">
+        <!-- Title Area -->
+        <TextBlock DockPanel.Dock="Top" 
+                  Text="{Binding DialogTitle}" 
+                  FontSize="18" 
+                  FontWeight="Bold" 
+                  Margin="0,0,0,20"
+                  HorizontalAlignment="Center" />
+        
+        <!-- Button Area -->
+        <Border DockPanel.Dock="Bottom" 
+                BorderBrush="Gray" 
+                BorderThickness="0,1,0,0" 
+                Padding="0,15,0,0" 
+                Margin="0,20,0,0">
+            <StackPanel Orientation="Horizontal" 
+                       HorizontalAlignment="Right" 
+                       Spacing="10">
+                <Button Content="Analyze" 
+                       Command="{Binding OkCommand}" 
+                       Padding="25,8"
+                       IsDefault="True" />
+                <Button Content="Cancel" 
+                       Command="{Binding CancelCommand}" 
+                       Padding="25,8"
+                       IsCancel="True" />
+            </StackPanel>
+        </Border>
+        
+        <!-- Content Area -->
+        <StackPanel Spacing="20">
+            <TextBlock Text="{Binding Description}" 
+                      TextWrapping="Wrap"
+                      FontSize="14"
+                      Foreground="DarkSlateGray" />
+            
+            <!-- Variable Selection -->
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="15">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Select Variable:" FontWeight="Bold" />
+                    
+                    <ComboBox ItemsSource="{Binding AvailableVariables}"
+                             SelectedItem="{Binding SelectedVariable}"
+                             Width="200"
+                             HorizontalAlignment="Left">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding CurrentValue, StringFormat='(Current: {0:F3})'}" 
+                                              Foreground="Gray" />
+                                    <TextBlock Text="{Binding Status}" 
+                                              Foreground="Blue"
+                                              FontStyle="Italic" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+            
+            <!-- Value Input (if applicable) -->
+            <Border BorderBrush="Gray" 
+                   BorderThickness="1" 
+                   Padding="15"
+                   IsVisible="{Binding ShowValueInput}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="{Binding ValueInputLabel}" FontWeight="Bold" />
+                    <NumericUpDown Value="{Binding NewValue}" 
+                                  Increment="0.1"
+                                  FormatString="F3"
+                                  Width="150"
+                                  HorizontalAlignment="Left" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </DockPanel>
+</Window>

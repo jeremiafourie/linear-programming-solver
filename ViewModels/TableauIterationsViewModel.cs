@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using AvaloniaGraphControl;
+using linear_programming_solver.Models;
 
 namespace linear_programming_solver.ViewModels;
 
@@ -13,40 +15,195 @@ public partial class TableauIterationsViewModel : ViewModelBase
     private int _totalIterations = 0;
 
     [ObservableProperty]
-    private string _tableauDisplay = "";
+    private TableauData _currentTableauData = new();
 
     [ObservableProperty]
     private string _pivotInfo = "";
 
+    [ObservableProperty]
+    private Graph _tableauGraph = new();
+
     public ObservableCollection<string> Iterations { get; } = new();
+    public ObservableCollection<TableauData> AllTableauData { get; } = new();
 
     public TableauIterationsViewModel()
     {
-        LoadSampleIterations();
+        LoadSampleTableauData();
+        BuildTableauGraph();
+        ShowIteration(0);
     }
 
-    public void LoadIterations(/* List<TableauIteration> iterations */)
+    public void LoadIterations(System.Collections.Generic.List<IterationData> iterations)
     {
         StatusMessage = "Loading tableau iterations...";
+        
+        AllTableauData.Clear();
         Iterations.Clear();
         
-        // Example data
-        Iterations.Add("Iteration 0: Initial tableau");
-        Iterations.Add("Iteration 1: After pivot on (1,2)");
-        Iterations.Add("Iteration 2: Optimal solution reached");
+        foreach (var iteration in iterations)
+        {
+            var tableauData = new TableauData
+            {
+                IterationNumber = iteration.IterationNumber,
+                PivotInfo = iteration.Description,
+                IsOptimal = iteration.IsOptimal
+            };
+            
+            // Copy variable columns
+            tableauData.VariableColumns.Clear();
+            foreach (var col in iteration.VariableColumns)
+            {
+                tableauData.VariableColumns.Add(col);
+            }
+            
+            // Copy tableau rows
+            tableauData.Rows.Clear();
+            foreach (var row in iteration.TableauRows)
+            {
+                tableauData.Rows.Add(new TableauRow
+                {
+                    BasisVariable = row.BasisVariable,
+                    Coefficients = new ObservableCollection<double>(row.Coefficients),
+                    Rhs = row.Rhs
+                });
+            }
+            
+            AllTableauData.Add(tableauData);
+            Iterations.Add($"Iteration {iteration.IterationNumber}: {iteration.Description}");
+        }
         
-        TotalIterations = Iterations.Count;
-        CurrentIteration = 0;
-        ShowIteration(0);
+        TotalIterations = AllTableauData.Count;
+        BuildTableauGraph();
+        
+        if (TotalIterations > 0)
+        {
+            ShowIteration(0);
+        }
+        else
+        {
+            LoadSampleTableauData();
+            BuildTableauGraph();
+            ShowIteration(0);
+        }
     }
 
-    private void LoadSampleIterations()
+    private void LoadSampleTableauData()
     {
+        AllTableauData.Clear();
+        Iterations.Clear();
+        
+        // Iteration 0: Initial Tableau
+        var iteration0 = new TableauData
+        {
+            IterationNumber = 0,
+            VariableColumns = new ObservableCollection<string> { "x1", "x2", "x3", "s1", "s2" },
+            PivotInfo = "Initial tableau - need to find entering variable",
+            IsOptimal = false
+        };
+        
+        iteration0.Rows.Add(new TableauRow 
+        { 
+            BasisVariable = "s1", 
+            Coefficients = new ObservableCollection<double> { 1.000, 2.000, 1.000, 1.000, 0.000 }, 
+            Rhs = 8.000 
+        });
+        iteration0.Rows.Add(new TableauRow 
+        { 
+            BasisVariable = "s2", 
+            Coefficients = new ObservableCollection<double> { 2.000, 1.000, 0.000, 0.000, 1.000 }, 
+            Rhs = 10.000 
+        });
+        iteration0.Rows.Add(new TableauRow 
+        { 
+            BasisVariable = "Z", 
+            Coefficients = new ObservableCollection<double> { -2.000, -3.000, -1.000, 0.000, 0.000 }, 
+            Rhs = 0.000 
+        });
+        
+        AllTableauData.Add(iteration0);
         Iterations.Add("Initial Tableau");
-        Iterations.Add("Iteration 1");
-        Iterations.Add("Final Tableau");
-        TotalIterations = Iterations.Count;
-        ShowIteration(0);
+        
+        // Iteration 1: After first pivot
+        var iteration1 = new TableauData
+        {
+            IterationNumber = 1,
+            VariableColumns = new ObservableCollection<string> { "x1", "x2", "x3", "s1", "s2" },
+            PivotInfo = "Pivot: x2 enters, s1 leaves at element (1,2) = 2.000",
+            IsOptimal = false
+        };
+        
+        iteration1.Rows.Add(new TableauRow 
+        { 
+            BasisVariable = "x2", 
+            Coefficients = new ObservableCollection<double> { 0.500, 1.000, 0.500, 0.500, 0.000 }, 
+            Rhs = 4.000 
+        });
+        iteration1.Rows.Add(new TableauRow 
+        { 
+            BasisVariable = "s2", 
+            Coefficients = new ObservableCollection<double> { 1.500, 0.000, -0.500, -0.500, 1.000 }, 
+            Rhs = 6.000 
+        });
+        iteration1.Rows.Add(new TableauRow 
+        { 
+            BasisVariable = "Z", 
+            Coefficients = new ObservableCollection<double> { -0.500, 0.000, 0.500, 1.500, 0.000 }, 
+            Rhs = 12.000 
+        });
+        
+        AllTableauData.Add(iteration1);
+        Iterations.Add("Iteration 1: x2 enters, s1 leaves");
+        
+        // Iteration 2: Optimal Solution
+        var iteration2 = new TableauData
+        {
+            IterationNumber = 2,
+            VariableColumns = new ObservableCollection<string> { "x1", "x2", "x3", "s1", "s2" },
+            PivotInfo = "Optimal solution reached - all coefficients non-negative",
+            IsOptimal = true
+        };
+        
+        iteration2.Rows.Add(new TableauRow 
+        { 
+            BasisVariable = "x2", 
+            Coefficients = new ObservableCollection<double> { 0.000, 1.000, 2.000, 1.000, -1.000 }, 
+            Rhs = 2.000 
+        });
+        iteration2.Rows.Add(new TableauRow 
+        { 
+            BasisVariable = "x1", 
+            Coefficients = new ObservableCollection<double> { 1.000, 0.000, -1.000, -1.000, 2.000 }, 
+            Rhs = 4.000 
+        });
+        iteration2.Rows.Add(new TableauRow 
+        { 
+            BasisVariable = "Z", 
+            Coefficients = new ObservableCollection<double> { 0.000, 0.000, 0.000, 1.000, 1.000 }, 
+            Rhs = 14.000 
+        });
+        
+        AllTableauData.Add(iteration2);
+        Iterations.Add("Iteration 2: Optimal Solution");
+        
+        TotalIterations = AllTableauData.Count;
+    }
+
+    private void BuildTableauGraph()
+    {
+        var graph = new Graph();
+        
+        // AvaloniaGraphControl infers nodes from edges, so we only need to create edges
+        
+        // Create edges between consecutive iterations
+        for (int i = 0; i < AllTableauData.Count - 1; i++)
+        {
+            var fromData = AllTableauData[i];
+            var toData = AllTableauData[i + 1];
+            
+            graph.Edges.Add(new Edge(fromData, toData));
+        }
+        
+        TableauGraph = graph;
     }
 
     [RelayCommand]
@@ -90,42 +247,10 @@ public partial class TableauIterationsViewModel : ViewModelBase
     {
         if (iteration < 0 || iteration >= TotalIterations) return;
 
-        // Sample tableau display based on iteration
-        TableauDisplay = iteration switch
-        {
-            0 => "   Basis │  x1    x2    x3    s1    s2  │  RHS   \n" +
-                 "   ─────────────────────────────────────────────── \n" +
-                 "    s1   │ 1.000 2.000 1.000 1.000 0.000│ 8.000  \n" +
-                 "    s2   │ 2.000 1.000 0.000 0.000 1.000│10.000  \n" +
-                 "   ─────────────────────────────────────────────── \n" +
-                 "     Z   │-2.000-3.000-1.000 0.000 0.000│ 0.000  ",
-            
-            1 => "   Basis │  x1    x2    x3    s1    s2  │  RHS   \n" +
-                 "   ─────────────────────────────────────────────── \n" +
-                 "    x2   │ 0.500 1.000 0.500 0.500 0.000│ 4.000  \n" +
-                 "    s2   │ 1.500 0.000-0.500-0.500 1.000│ 6.000  \n" +
-                 "   ─────────────────────────────────────────────── \n" +
-                 "     Z   │-0.500 0.000 0.500 1.500 0.000│12.000  ",
-            
-            2 => "   Basis │  x1    x2    x3    s1    s2  │  RHS   \n" +
-                 "   ─────────────────────────────────────────────── \n" +
-                 "    x2   │ 0.000 1.000 2.000 1.000-1.000│ 2.000  \n" +
-                 "    x1   │ 1.000 0.000-1.000-1.000 2.000│ 4.000  \n" +
-                 "   ─────────────────────────────────────────────── \n" +
-                 "     Z   │ 0.000 0.000 0.000 1.000 1.000│14.000  ",
-            
-            _ => "No tableau data available"
-        };
-
-        PivotInfo = iteration switch
-        {
-            0 => "Entering Variable: x2, Leaving Variable: s1, Pivot Element: (1,2) = 2.000",
-            1 => "Entering Variable: x1, Leaving Variable: s2, Pivot Element: (2,1) = 1.500",
-            2 => "Optimal solution reached",
-            _ => ""
-        };
-
-        StatusMessage = $"Viewing iteration {iteration + 1} of {TotalIterations}";
+        var tableauData = AllTableauData[iteration];
+        CurrentTableauData = tableauData;
+        PivotInfo = tableauData.PivotInfo;
+        StatusMessage = $"Viewing iteration {iteration} of {TotalIterations - 1}";
     }
 
     public bool CanGoPrevious => CurrentIteration > 0;

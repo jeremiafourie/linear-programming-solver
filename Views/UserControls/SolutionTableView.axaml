@@ -57,6 +57,70 @@
                         </Grid>
                     </StackPanel>
                 </Border>
+                
+                <!-- Variable Results -->
+                <Border BorderBrush="Gray" 
+                        BorderThickness="1" 
+                        Padding="15">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Variable Values" 
+                                  FontWeight="Bold" 
+                                  FontSize="16" />
+                        
+                        <DataGrid ItemsSource="{Binding Variables}"
+                                 IsReadOnly="True"
+                                 GridLinesVisibility="All"
+                                 BorderThickness="1"
+                                 BorderBrush="Gray">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Variable" 
+                                                   Binding="{Binding Name}" 
+                                                   Width="100" />
+                                <DataGridTextColumn Header="Value" 
+                                                   Binding="{Binding Value, StringFormat=F3}" 
+                                                   Width="100" />
+                                <DataGridTextColumn Header="Status" 
+                                                   Binding="{Binding Status}" 
+                                                   Width="100" />
+                                <DataGridTextColumn Header="Shadow Price" 
+                                                   Binding="{Binding ShadowPrice, StringFormat=F3}" 
+                                                   Width="100" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Constraint Results -->
+                <Border BorderBrush="Gray" 
+                        BorderThickness="1" 
+                        Padding="15">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Constraint Status" 
+                                  FontWeight="Bold" 
+                                  FontSize="16" />
+                        
+                        <DataGrid ItemsSource="{Binding Constraints}"
+                                 IsReadOnly="True"
+                                 GridLinesVisibility="All"
+                                 BorderThickness="1"
+                                 BorderBrush="Gray">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Constraint" 
+                                                   Binding="{Binding Name}" 
+                                                   Width="120" />
+                                <DataGridTextColumn Header="Slack/Surplus" 
+                                                   Binding="{Binding Slack, StringFormat=F3}" 
+                                                   Width="100" />
+                                <DataGridTextColumn Header="Status" 
+                                                   Binding="{Binding Status}" 
+                                                   Width="100" />
+                                <DataGridTextColumn Header="Shadow Price" 
+                                                   Binding="{Binding ShadowPrice, StringFormat=F3}" 
+                                                   Width="100" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
     </DockPanel>

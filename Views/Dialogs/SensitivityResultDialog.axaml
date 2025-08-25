@@ -1,0 +1,166 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:linear_programming_solver.ViewModels.Dialogs"
+        x:Class="linear_programming_solver.Views.Dialogs.SensitivityResultDialog"
+        x:DataType="vm:SensitivityResultDialogViewModel"
+        Title="{Binding DialogTitle}"
+        Width="600" Height="500"
+        MinWidth="500" MinHeight="400"
+        WindowStartupLocation="CenterOwner"
+        CanResize="true">
+    
+    <DockPanel Margin="20">
+        <!-- Title Area -->
+        <TextBlock DockPanel.Dock="Top" 
+                  Text="{Binding DialogTitle}" 
+                  FontSize="18" 
+                  FontWeight="Bold" 
+                  Margin="0,0,0,20"
+                  HorizontalAlignment="Center" />
+        
+        <!-- Button Area -->
+        <Border DockPanel.Dock="Bottom" 
+                BorderBrush="Gray" 
+                BorderThickness="0,1,0,0" 
+                Padding="0,15,0,0" 
+                Margin="0,20,0,0">
+            <StackPanel Orientation="Horizontal" 
+                       HorizontalAlignment="Right" 
+                       Spacing="10">
+                <Button Content="Export Results" 
+                       Command="{Binding ExportCommand}" 
+                       Padding="25,8" />
+                <Button Content="Close" 
+                       Command="{Binding OkCommand}" 
+                       Padding="25,8"
+                       IsDefault="True" />
+            </StackPanel>
+        </Border>
+        
+        <!-- Content Area -->
+        <ScrollViewer>
+            <StackPanel Spacing="20">
+                <!-- Analysis Summary -->
+                <Border BorderBrush="DarkBlue" 
+                        BorderThickness="2" 
+                        Padding="15"
+                        Background="AliceBlue">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Analysis Summary" 
+                                  FontWeight="Bold" 
+                                  FontSize="16" />
+                        
+                        <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="10">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Analysis Type:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding AnalysisType}" />
+                            
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Variable/Item:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding VariableName}" />
+                            
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Current Value:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentValue, StringFormat='{}{0:F3}'}" />
+                            
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Status:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" 
+                                      Text="{Binding Status}"
+                                      Foreground="{Binding StatusColor}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Range Information -->
+                <Border BorderBrush="Gray" 
+                        BorderThickness="1" 
+                        Padding="15"
+                        IsVisible="{Binding ShowRange}">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Allowable Range" 
+                                  FontWeight="Bold" 
+                                  FontSize="14" />
+                        
+                        <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto" Margin="10">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Lower Bound:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding LowerBound, StringFormat='{}{0:F3}'}" />
+                            
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Upper Bound:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding UpperBound, StringFormat='{}{0:F3}'}" />
+                            
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Range Size:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RangeSize, StringFormat='{}{0:F3}'}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Impact Analysis -->
+                <Border BorderBrush="Gray" 
+                        BorderThickness="1" 
+                        Padding="15"
+                        IsVisible="{Binding ShowImpactAnalysis}">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Impact Analysis" 
+                                  FontWeight="Bold" 
+                                  FontSize="14" />
+                        
+                        <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto" Margin="10">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="New Value:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding NewValue, StringFormat='{}{0:F3}'}" />
+                            
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Obj. Change:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ObjectiveChange, StringFormat='{}{0:F3}'}" />
+                            
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="New Obj. Value:" FontWeight="Bold" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding NewObjectiveValue, StringFormat='{}{0:F3}'}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Shadow Price Information -->
+                <Border BorderBrush="Gray" 
+                        BorderThickness="1" 
+                        Padding="15"
+                        IsVisible="{Binding ShowShadowPrices}">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Shadow Price Information" 
+                                  FontWeight="Bold" 
+                                  FontSize="14" />
+                        
+                        <DataGrid ItemsSource="{Binding ShadowPrices}"
+                                 IsReadOnly="True"
+                                 GridLinesVisibility="All"
+                                 BorderThickness="1"
+                                 BorderBrush="Gray"
+                                 MaxHeight="200">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Constraint" 
+                                                   Binding="{Binding ConstraintName}" 
+                                                   Width="120" />
+                                <DataGridTextColumn Header="Shadow Price" 
+                                                   Binding="{Binding Price, StringFormat=F3}" 
+                                                   Width="100" />
+                                <DataGridTextColumn Header="Interpretation" 
+                                                   Binding="{Binding Interpretation}" 
+                                                   Width="*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Detailed Description -->
+                <Border BorderBrush="Gray" 
+                        BorderThickness="1" 
+                        Padding="15">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Interpretation" 
+                                  FontWeight="Bold" 
+                                  FontSize="14" />
+                        
+                        <TextBlock Text="{Binding DetailedDescription}" 
+                                  TextWrapping="Wrap"
+                                  LineHeight="20"
+                                  Foreground="DarkSlateGray" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

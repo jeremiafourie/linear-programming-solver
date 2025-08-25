@@ -7,6 +7,10 @@
         Title="{Binding WindowTitle}"
         Width="1200" Height="800">
 
+    <Window.Resources>
+        <vm:AlgorithmSelectionConverter x:Key="AlgorithmSelectionConverter"/>
+    </Window.Resources>
+
     <Window.DataTemplates>
         <DataTemplate DataType="vm:WelcomeViewModel">
             <uc:WelcomeView />
@@ -16,6 +20,9 @@
         </DataTemplate>
         <DataTemplate DataType="vm:SolutionTableViewModel">
             <uc:SolutionTableView />
+        </DataTemplate>
+        <DataTemplate DataType="vm:IterationDiagramViewModel">
+            <uc:IterationDiagramView />
         </DataTemplate>
         <DataTemplate DataType="vm:TableauIterationsViewModel">
             <uc:TableauIterationsView />
@@ -62,16 +69,46 @@
             <!-- Algorithm Menu -->
             <MenuItem Header="_Algorithm">
                 <MenuItem Header="Select Algorithm">
-                    <MenuItem Header="● Primal Simplex" 
-                             Command="{Binding SelectPrimalSimplexCommand}" />
-                    <MenuItem Header="○ Revised Primal Simplex" 
-                             Command="{Binding SelectRevisedPrimalSimplexCommand}" />
-                    <MenuItem Header="○ Branch &amp; Bound Simplex" 
-                             Command="{Binding SelectBranchAndBoundSimplexCommand}" />
-                    <MenuItem Header="○ Cutting Plane" 
-                             Command="{Binding SelectCuttingPlaneCommand}" />
-                    <MenuItem Header="○ Branch &amp; Bound Knapsack" 
-                             Command="{Binding SelectBranchAndBoundKnapsackCommand}" />
+                    <MenuItem Command="{Binding SelectPrimalSimplexCommand}">
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding SelectedAlgorithm, Converter={StaticResource AlgorithmSelectionConverter}, ConverterParameter=primalsimplex}" />
+                                <TextBlock Text="Primal Simplex" />
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem Command="{Binding SelectRevisedPrimalSimplexCommand}">
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding SelectedAlgorithm, Converter={StaticResource AlgorithmSelectionConverter}, ConverterParameter=revisedprimalsimplex}" />
+                                <TextBlock Text="Revised Primal Simplex" />
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem Command="{Binding SelectBranchAndBoundSimplexCommand}">
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding SelectedAlgorithm, Converter={StaticResource AlgorithmSelectionConverter}, ConverterParameter=branchandboundsimplex}" />
+                                <TextBlock Text="Branch &amp; Bound Simplex" />
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem Command="{Binding SelectCuttingPlaneCommand}">
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding SelectedAlgorithm, Converter={StaticResource AlgorithmSelectionConverter}, ConverterParameter=cuttingplane}" />
+                                <TextBlock Text="Cutting Plane" />
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem Command="{Binding SelectBranchAndBoundKnapsackCommand}">
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding SelectedAlgorithm, Converter={StaticResource AlgorithmSelectionConverter}, ConverterParameter=branchandboundknapsack}" />
+                                <TextBlock Text="Branch &amp; Bound Knapsack" />
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
                 </MenuItem>
                 
                 <Separator />
@@ -79,9 +116,6 @@
                 <MenuItem Header="_Solve Problem" 
                          Command="{Binding SolveProblemCommand}"
                          InputGesture="F5" />
-                
-                <MenuItem Header="Solve _Configuration..." 
-                         Command="{Binding SolveConfigurationCommand}" />
                 
                 <MenuItem Header="_View Solution Details" 
                          Command="{Binding ViewSolutionDetailsCommand}" />

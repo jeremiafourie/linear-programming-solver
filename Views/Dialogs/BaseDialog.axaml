@@ -1,0 +1,44 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:linear_programming_solver.ViewModels.Dialogs"
+        x:Class="linear_programming_solver.Views.Dialogs.BaseDialog"
+        x:DataType="vm:BaseDialogViewModel"
+        Title="Linear Programming Solver"
+        Width="500" Height="400"
+        MinWidth="400" MinHeight="300"
+        WindowStartupLocation="CenterOwner"
+        CanResize="true">
+    
+    <DockPanel Margin="20">
+        <!-- Title Area -->
+        <TextBlock DockPanel.Dock="Top" 
+                  Text="{Binding DialogTitle}" 
+                  FontSize="18" 
+                  FontWeight="Bold" 
+                  Margin="0,0,0,20"
+                  HorizontalAlignment="Center" />
+        
+        <!-- Button Area -->
+        <Border DockPanel.Dock="Bottom" 
+                BorderBrush="Gray" 
+                BorderThickness="0,1,0,0" 
+                Padding="0,15,0,0" 
+                Margin="0,20,0,0">
+            <StackPanel Orientation="Horizontal" 
+                       HorizontalAlignment="Right" 
+                       Spacing="10">
+                <Button Content="OK" 
+                       Command="{Binding OkCommand}" 
+                       Padding="25,8"
+                       IsDefault="True" />
+                <Button Content="Cancel" 
+                       Command="{Binding CancelCommand}" 
+                       Padding="25,8"
+                       IsCancel="True" />
+            </StackPanel>
+        </Border>
+        
+        <!-- Content Area -->
+        <ContentPresenter Content="{Binding DialogContent}" />
+    </DockPanel>
+</Window>

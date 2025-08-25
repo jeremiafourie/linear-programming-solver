@@ -1,6 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:linear_programming_solver.ViewModels"
+             xmlns:m="using:linear_programming_solver.Models"
+             xmlns:agc="clr-namespace:AvaloniaGraphControl;assembly=AvaloniaGraphControl"
              x:Class="linear_programming_solver.Views.UserControls.TableauIterationsView"
              x:DataType="vm:TableauIterationsViewModel">
     
@@ -40,55 +42,214 @@
         </Border>
         
         <!-- Content -->
-        <ScrollViewer>
-            <StackPanel Spacing="25">
-                <TextBlock Text="Tableau Iterations" 
-                          FontSize="22" 
-                          FontWeight="Bold" />
-                
-                <!-- Current Iteration Display -->
-                <Border BorderBrush="DarkGreen" 
-                        BorderThickness="2" 
-                        Padding="20"
-                        Background="LightGreen">
-                    <StackPanel Spacing="15">
-                        <TextBlock Text="{Binding CurrentIteration, StringFormat='Iteration {0}:'}" 
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+            
+            <!-- Left Panel: Graph Visualization with DataGrid Nodes -->
+            <Border Grid.Column="0" 
+                    BorderBrush="Gray" 
+                    BorderThickness="0,0,1,0" 
+                    Margin="0,0,10,0">
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Tableau Flow Diagram" 
+                              FontSize="20" 
+                              FontWeight="Bold" 
+                              HorizontalAlignment="Center" />
+                    
+                    <!-- Graph Control with Simple DataGrid Nodes -->
+                    <Border BorderBrush="DarkBlue" 
+                            BorderThickness="2" 
+                            Background="White" 
+                            MinHeight="500">
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" 
+                                    VerticalScrollBarVisibility="Auto">
+                            <agc:GraphPanel Graph="{Binding TableauGraph}" 
+                                           LayoutMethod="SugiyamaScheme"
+                                           Margin="20">
+                                <agc:GraphPanel.DataTemplates>
+                                    <DataTemplate DataType="m:TableauData">
+                                        <Border Background="{Binding IsOptimal, Converter={x:Static vm:BoolToColorConverter.Instance}}"
+                                                BorderBrush="{Binding IsOptimal, Converter={x:Static vm:BoolToBorderConverter.Instance}}"
+                                                BorderThickness="3"
+                                                CornerRadius="8"
+                                                Padding="12"
+                                                MaxWidth="350">
+                                            <StackPanel Spacing="10">
+                                                <!-- Node Title -->
+                                                <TextBlock Text="{Binding Title}"
+                                                          FontWeight="Bold"
+                                                          FontSize="14"
+                                                          HorizontalAlignment="Center"
+                                                          Foreground="DarkBlue"/>
+                                                
+                                                <!-- Simple Grid Table -->
+                                                <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3">
+                                                    <Grid ShowGridLines="True">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="35"/>
+                                                            <ColumnDefinition Width="40"/>
+                                                            <ColumnDefinition Width="40"/>
+                                                            <ColumnDefinition Width="40"/>
+                                                            <ColumnDefinition Width="35"/>
+                                                            <ColumnDefinition Width="35"/>
+                                                            <ColumnDefinition Width="45"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        
+                                                        <!-- Headers -->
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Basis" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="2"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="x1" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="2"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="x2" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="2"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="3" Text="x3" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="2"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="4" Text="s1" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="2"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="5" Text="s2" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="2"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="6" Text="RHS" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="2"/>
+                                                        
+                                                        <!-- Row 1 Data -->
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Rows[0].BasisVariable}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Rows[0].Coefficients[0], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Rows[0].Coefficients[1], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding Rows[0].Coefficients[2], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="4" Text="{Binding Rows[0].Coefficients[3], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="5" Text="{Binding Rows[0].Coefficients[4], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="6" Text="{Binding Rows[0].FormattedRhs}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        
+                                                        <!-- Row 2 Data -->
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding Rows[1].BasisVariable}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Rows[1].Coefficients[0], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding Rows[1].Coefficients[1], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding Rows[1].Coefficients[2], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="4" Text="{Binding Rows[1].Coefficients[3], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="5" Text="{Binding Rows[1].Coefficients[4], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="6" Text="{Binding Rows[1].FormattedRhs}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        
+                                                        <!-- Row 3 Data (Z row) -->
+                                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding Rows[2].BasisVariable}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Rows[2].Coefficients[0], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding Rows[2].Coefficients[1], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding Rows[2].Coefficients[2], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="3" Grid.Column="4" Text="{Binding Rows[2].Coefficients[3], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="3" Grid.Column="5" Text="{Binding Rows[2].Coefficients[4], StringFormat=F1}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                        <TextBlock Grid.Row="3" Grid.Column="6" Text="{Binding Rows[2].FormattedRhs}" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="1"/>
+                                                    </Grid>
+                                                </Border>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </agc:GraphPanel.DataTemplates>
+                            </agc:GraphPanel>
+                        </ScrollViewer>
+                    </Border>
+                    
+                    <!-- Legend -->
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Legend:" FontWeight="Bold" FontSize="14" />
+                        <StackPanel Orientation="Horizontal" Spacing="15">
+                            <Border Background="LightBlue" BorderBrush="DarkBlue" BorderThickness="2" CornerRadius="4" Padding="8,4">
+                                <TextBlock Text="Iteration" FontSize="11" FontWeight="SemiBold" />
+                            </Border>
+                            <Border Background="LightGreen" BorderBrush="DarkGreen" BorderThickness="2" CornerRadius="4" Padding="8,4">
+                                <TextBlock Text="Optimal Solution" FontSize="11" FontWeight="SemiBold" />
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            
+            <!-- Right Panel: Detailed DataGrid View -->
+            <ScrollViewer Grid.Column="1">
+                <StackPanel Spacing="20">
+                    <TextBlock Text="Current Tableau Details" 
+                              FontSize="18" 
+                              FontWeight="Bold" />
+                    
+                    <!-- Current Iteration Full DataGrid -->
+                    <Border BorderBrush="DarkGreen" 
+                            BorderThickness="2" 
+                            Padding="15"
+                            Background="LightGreen"
+                            CornerRadius="5">
+                        <StackPanel Spacing="15">
+                            <TextBlock Text="{Binding CurrentTableauData.Title}" 
+                                      FontWeight="Bold" 
+                                      FontSize="16"
+                                      HorizontalAlignment="Center" />
+                            
+                            <Border Background="White" 
+                                   BorderBrush="Gray" 
+                                   BorderThickness="1" 
+                                   CornerRadius="3">
+                                <DataGrid ItemsSource="{Binding CurrentTableauData.Rows}"
+                                         AutoGenerateColumns="False"
+                                         GridLinesVisibility="All"
+                                         HeadersVisibility="Column"
+                                         FontSize="12"
+                                         MinHeight="150"
+                                         CanUserReorderColumns="False"
+                                         CanUserResizeColumns="True"
+                                         CanUserSortColumns="False"
+                                         IsReadOnly="True">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Basis Variable" 
+                                                          Binding="{Binding BasisVariable}"
+                                                          Width="Auto"/>
+                                        <DataGridTextColumn Header="x1" 
+                                                          Binding="{Binding Coefficients[0], StringFormat=F3}"
+                                                          Width="60"/>
+                                        <DataGridTextColumn Header="x2" 
+                                                          Binding="{Binding Coefficients[1], StringFormat=F3}"
+                                                          Width="60"/>
+                                        <DataGridTextColumn Header="x3" 
+                                                          Binding="{Binding Coefficients[2], StringFormat=F3}"
+                                                          Width="60"/>
+                                        <DataGridTextColumn Header="s1" 
+                                                          Binding="{Binding Coefficients[3], StringFormat=F3}"
+                                                          Width="60"/>
+                                        <DataGridTextColumn Header="s2" 
+                                                          Binding="{Binding Coefficients[4], StringFormat=F3}"
+                                                          Width="60"/>
+                                        <DataGridTextColumn Header="RHS" 
+                                                          Binding="{Binding FormattedRhs}"
+                                                          Width="70"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                            
+                            <TextBlock Text="{Binding PivotInfo}" 
+                                      FontWeight="Bold" 
+                                      FontSize="12"
+                                      Foreground="DarkBlue"
+                                      TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Iteration List -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="All Iterations" 
                                   FontWeight="Bold" 
                                   FontSize="16" />
-                        
-                        <Border Background="White" 
-                               BorderBrush="Gray" 
-                               BorderThickness="1" 
-                               Padding="15">
-                            <TextBlock Text="{Binding TableauDisplay}" 
-                                      FontFamily="Consolas,Monaco,monospace" 
-                                      FontSize="11"
-                                      Foreground="Black" />
-                        </Border>
-                        
-                        <TextBlock Text="{Binding PivotInfo}" 
-                                  FontWeight="Bold" 
-                                  FontSize="12"
-                                  Foreground="DarkBlue" />
+                        <ListBox ItemsSource="{Binding Iterations}"
+                                SelectedIndex="{Binding CurrentIteration}"
+                                Height="120">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding .}" 
+                                              Padding="8,4" 
+                                              FontSize="12" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
                     </StackPanel>
-                </Border>
-                
-                <!-- Iteration List -->
-                <StackPanel Spacing="10">
-                    <TextBlock Text="All Iterations" 
-                              FontWeight="Bold" 
-                              FontSize="16" />
-                    <ListBox ItemsSource="{Binding Iterations}"
-                            SelectedIndex="{Binding CurrentIteration}"
-                            Height="150">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding .}" Padding="5" />
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
                 </StackPanel>
-            </StackPanel>
-        </ScrollViewer>
+            </ScrollViewer>
+        </Grid>
     </DockPanel>
 </UserControl>

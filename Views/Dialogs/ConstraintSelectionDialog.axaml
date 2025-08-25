@@ -1,0 +1,94 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:linear_programming_solver.ViewModels.Dialogs"
+        x:Class="linear_programming_solver.Views.Dialogs.ConstraintSelectionDialog"
+        x:DataType="vm:ConstraintSelectionDialogViewModel"
+        Title="{Binding DialogTitle}"
+        Width="500" Height="400"
+        MinWidth="450" MinHeight="350"
+        WindowStartupLocation="CenterOwner"
+        CanResize="false">
+    
+    <DockPanel Margin="20">
+        <!-- Title Area -->
+        <TextBlock DockPanel.Dock="Top" 
+                  Text="{Binding DialogTitle}" 
+                  FontSize="18" 
+                  FontWeight="Bold" 
+                  Margin="0,0,0,20"
+                  HorizontalAlignment="Center" />
+        
+        <!-- Button Area -->
+        <Border DockPanel.Dock="Bottom" 
+                BorderBrush="Gray" 
+                BorderThickness="0,1,0,0" 
+                Padding="0,15,0,0" 
+                Margin="0,20,0,0">
+            <StackPanel Orientation="Horizontal" 
+                       HorizontalAlignment="Right" 
+                       Spacing="10">
+                <Button Content="Analyze" 
+                       Command="{Binding OkCommand}" 
+                       Padding="25,8"
+                       IsDefault="True" />
+                <Button Content="Cancel" 
+                       Command="{Binding CancelCommand}" 
+                       Padding="25,8"
+                       IsCancel="True" />
+            </StackPanel>
+        </Border>
+        
+        <!-- Content Area -->
+        <StackPanel Spacing="20">
+            <TextBlock Text="{Binding Description}" 
+                      TextWrapping="Wrap"
+                      FontSize="14"
+                      Foreground="DarkSlateGray" />
+            
+            <!-- Constraint Selection -->
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="15">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Select Constraint:" FontWeight="Bold" />
+                    
+                    <ComboBox ItemsSource="{Binding AvailableConstraints}"
+                             SelectedItem="{Binding SelectedConstraint}"
+                             Width="300"
+                             HorizontalAlignment="Left">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding Description}" 
+                                              FontSize="11"
+                                              Foreground="Gray" />
+                                    <TextBlock Text="{Binding CurrentRHS, StringFormat='Current RHS: {0:F3}'}" 
+                                              FontSize="11"
+                                              Foreground="Blue" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+            
+            <!-- RHS Value Input (if applicable) -->
+            <Border BorderBrush="Gray" 
+                   BorderThickness="1" 
+                   Padding="15"
+                   IsVisible="{Binding ShowRhsInput}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="New Right-Hand-Side Value:" FontWeight="Bold" />
+                    <NumericUpDown Value="{Binding NewRhsValue}" 
+                                  Increment="0.1"
+                                  FormatString="F3"
+                                  Width="150"
+                                  HorizontalAlignment="Left" />
+                    <TextBlock Text="Note: This will show the impact of changing the constraint's RHS value."
+                              FontSize="11"
+                              Foreground="Gray"
+                              FontStyle="Italic" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </DockPanel>
+</Window>

@@ -1,0 +1,174 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:linear_programming_solver.ViewModels"
+             xmlns:m="using:linear_programming_solver.Models"
+             xmlns:agc="clr-namespace:AvaloniaGraphControl;assembly=AvaloniaGraphControl"
+             xmlns:paz="clr-namespace:Avalonia.Controls.PanAndZoom;assembly=PanAndZoom"
+             x:Class="linear_programming_solver.Views.UserControls.IterationDiagramView"
+             x:DataType="vm:IterationDiagramViewModel">
+    
+    <!-- Full-screen interactive diagram view -->
+    <Border BorderBrush="DarkBlue" 
+            BorderThickness="2" 
+            Background="White" 
+            CornerRadius="5"
+            Margin="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            
+            <!-- Algorithm Header -->
+            <Border Grid.Row="0" 
+                    Background="LightGray" 
+                    Padding="15,10"
+                    BorderThickness="0,0,0,1"
+                    BorderBrush="Gray">
+                <TextBlock Text="{Binding AlgorithmName}" 
+                          FontSize="20" 
+                          FontWeight="Bold" 
+                          HorizontalAlignment="Center" />
+            </Border>
+            
+            <!-- Interactive Controls -->
+            <Border Grid.Row="1" 
+                    Background="WhiteSmoke" 
+                    Padding="15,8"
+                    BorderThickness="0,0,0,1"
+                    BorderBrush="LightGray">
+                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                    <TextBlock Text="Navigation: Use mouse wheel to zoom • Drag to pan • F=Fit • R=Reset" 
+                              VerticalAlignment="Center" 
+                              FontSize="12" 
+                              Foreground="DarkSlateGray"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Interactive Diagram Area with PanAndZoom -->
+            <Border Grid.Row="2" Background="White">
+                <paz:ZoomBorder x:Name="ZoomBorder" 
+                               Stretch="None"
+                               ZoomSpeed="1.2"
+                               Background="Transparent"
+                               EnableConstrains="True"
+                               MinZoomX="0.1"
+                               MaxZoomX="5.0"
+                               MinZoomY="0.1"
+                               MaxZoomY="5.0">
+                    
+                    <agc:GraphPanel x:Name="GraphPanel"
+                                   Graph="{Binding IterationGraph}" 
+                                   LayoutMethod="SugiyamaScheme"
+                                   MinHeight="600"
+                                   MinWidth="800"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center">
+                        <agc:GraphPanel.DataTemplates>
+                                <DataTemplate DataType="m:IterationData">
+                                    <Border Background="{Binding IsOptimal, Converter={x:Static vm:BoolToColorConverter.Instance}}"
+                                            BorderBrush="{Binding IsFinal, Converter={x:Static vm:BoolToBorderConverter.Instance}}"
+                                            BorderThickness="3"
+                                            CornerRadius="8"
+                                            Padding="12"
+                                            MinWidth="320"
+                                            MaxWidth="380"
+                                            Cursor="Hand"
+                                            ToolTip.Tip="{Binding Description}">
+                                        <StackPanel Spacing="8">
+                                            <!-- Node Header -->
+                                            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                                <Border Background="DarkBlue" 
+                                                       CornerRadius="6" 
+                                                       Padding="4,2">
+                                                    <TextBlock Text="{Binding NodeType}"
+                                                              FontSize="9"
+                                                              FontWeight="Bold"
+                                                              Foreground="White"/>
+                                                </Border>
+                                                
+                                                <TextBlock Text="{Binding Title}"
+                                                          FontWeight="Bold"
+                                                          FontSize="12"
+                                                          Foreground="DarkBlue"/>
+                                                          
+                                                <Border Background="{Binding Status, Converter={x:Static vm:StatusToColorConverter.Instance}}" 
+                                                       CornerRadius="4" 
+                                                       Padding="3,1">
+                                                    <TextBlock Text="{Binding Status}"
+                                                              FontSize="8"
+                                                              FontWeight="SemiBold"
+                                                              Foreground="White"/>
+                                                </Border>
+                                            </StackPanel>
+                                            
+                                            <!-- Tableau DataGrid -->
+                                            <Border BorderBrush="Gray" 
+                                                   BorderThickness="1" 
+                                                   CornerRadius="3"
+                                                   Background="White">
+                                                <DataGrid ItemsSource="{Binding TableauRows}"
+                                                         AutoGenerateColumns="False"
+                                                         GridLinesVisibility="All"
+                                                         HeadersVisibility="Column"
+                                                         FontSize="8"
+                                                         MaxHeight="140"
+                                                         MinHeight="100"
+                                                         CanUserReorderColumns="False"
+                                                         CanUserResizeColumns="False"
+                                                         CanUserSortColumns="False"
+                                                         IsReadOnly="True"
+                                                         Background="White">
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Header="Basis" 
+                                                                          Binding="{Binding BasisVariable}"
+                                                                          Width="35"
+                                                                          FontSize="7"/>
+                                                        <DataGridTextColumn Header="x1" 
+                                                                          Binding="{Binding Coefficients[0], StringFormat=F1}"
+                                                                          Width="32"
+                                                                          FontSize="7"/>
+                                                        <DataGridTextColumn Header="x2" 
+                                                                          Binding="{Binding Coefficients[1], StringFormat=F1}"
+                                                                          Width="32"
+                                                                          FontSize="7"/>
+                                                        <DataGridTextColumn Header="x3" 
+                                                                          Binding="{Binding Coefficients[2], StringFormat=F1}"
+                                                                          Width="32"
+                                                                          FontSize="7"/>
+                                                        <DataGridTextColumn Header="s1" 
+                                                                          Binding="{Binding Coefficients[3], StringFormat=F1}"
+                                                                          Width="30"
+                                                                          FontSize="7"/>
+                                                        <DataGridTextColumn Header="s2" 
+                                                                          Binding="{Binding Coefficients[4], StringFormat=F1}"
+                                                                          Width="30"
+                                                                          FontSize="7"/>
+                                                        <DataGridTextColumn Header="RHS" 
+                                                                          Binding="{Binding FormattedRhs}"
+                                                                          Width="42"
+                                                                          FontSize="7"/>
+                                                    </DataGrid.Columns>
+                                                </DataGrid>
+                                            </Border>
+                                            
+                                            <!-- Branch Constraint -->
+                                            <TextBlock Text="{Binding Description}"
+                                                      FontSize="9"
+                                                      TextAlignment="Center"
+                                                      TextWrapping="Wrap"
+                                                      Foreground="DarkSlateGray"
+                                                      MaxWidth="300"
+                                                      FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </agc:GraphPanel.DataTemplates>
+                        </agc:GraphPanel>
+                    
+                </paz:ZoomBorder>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>
