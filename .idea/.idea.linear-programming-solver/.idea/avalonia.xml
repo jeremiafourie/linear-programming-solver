@@ -5,6 +5,8 @@
       <map>
         <entry key="App.axaml" value="linear-programming-solver.csproj" />
         <entry key="Views/MainWindow.axaml" value="linear-programming-solver.csproj" />
+        <entry key="Views/UserControls/CanonicalFormView.axaml" value="linear-programming-solver.csproj" />
+        <entry key="Views/UserControls/IterationDiagramView.axaml" value="linear-programming-solver.csproj" />
         <entry key="Views/UserControls/ProblemEditorView.axaml" value="linear-programming-solver.csproj" />
         <entry key="Views/UserControls/SolutionTableView.axaml" value="linear-programming-solver.csproj" />
         <entry key="Views/UserControls/TableauIterationsView.axaml" value="linear-programming-solver.csproj" />
