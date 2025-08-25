@@ -257,7 +257,8 @@ public class CuttingPlaneSolver
             Description = description,
             Status = "In Progress",
             IsOptimal = lpSolution.Status == SolutionStatus.Optimal && IsIntegerFeasible(lpSolution, lpSolution.Problem),
-            IsFinal = lpSolution.Status != SolutionStatus.Optimal
+            IsFinal = lpSolution.Status != SolutionStatus.Optimal,
+            NodeType = "Cut"
         };
 
         if (lpSolution.Variables != null)
@@ -266,7 +267,74 @@ public class CuttingPlaneSolver
             iterationData.Data["ObjectiveValue"] = lpSolution.ObjectiveValue;
         }
 
+        // Copy tableau data from LP solution if available
+        if (lpSolution.Iterations.Count > 0)
+        {
+            var lastIteration = lpSolution.Iterations.Last();
+            
+            foreach (var col in lastIteration.VariableColumns)
+            {
+                iterationData.VariableColumns.Add(col);
+            }
+            
+            foreach (var row in lastIteration.TableauRows)
+            {
+                var newRow = new TableauRow
+                {
+                    BasisVariable = row.BasisVariable,
+                    Rhs = row.Rhs
+                };
+                foreach (var coeff in row.Coefficients)
+                {
+                    newRow.Coefficients.Add(coeff);
+                }
+                iterationData.TableauRows.Add(newRow);
+            }
+        }
+        else
+        {
+            // Create simplified display
+            CreateCuttingPlaneDisplay(lpSolution, iterationData);
+        }
+
         return iterationData;
+    }
+    
+    private void CreateCuttingPlaneDisplay(SimplexSolution lpSolution, IterationData iterationData)
+    {
+        iterationData.VariableColumns.Add("Variable");
+        iterationData.VariableColumns.Add("Value");
+        iterationData.VariableColumns.Add("Integer");
+        
+        if (lpSolution.Variables != null)
+        {
+            for (int i = 0; i < Math.Min(6, lpSolution.Variables.Length); i++)
+            {
+                var row = new TableauRow
+                {
+                    BasisVariable = $"x{i + 1}",
+                    Rhs = lpSolution.Variables[i]
+                };
+                
+                row.Coefficients.Add(lpSolution.Variables[i]);
+                row.Coefficients.Add(Math.Round(lpSolution.Variables[i])); // Integer part
+                row.Coefficients.Add(Math.Abs(lpSolution.Variables[i] - Math.Round(lpSolution.Variables[i])) < EPSILON ? 1.0 : 0.0); // Is integer?
+                
+                iterationData.TableauRows.Add(row);
+            }
+        }
+        
+        // Add objective row
+        var objRow = new TableauRow
+        {
+            BasisVariable = "Z",
+            Rhs = lpSolution.ObjectiveValue
+        };
+        objRow.Coefficients.Add(lpSolution.ObjectiveValue);
+        objRow.Coefficients.Add(0);
+        objRow.Coefficients.Add(iterationData.IsOptimal ? 1.0 : 0.0);
+        
+        iterationData.TableauRows.Add(objRow);
     }
 }
 

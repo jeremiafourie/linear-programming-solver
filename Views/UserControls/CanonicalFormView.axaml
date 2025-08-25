@@ -1,0 +1,244 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:linear_programming_solver.ViewModels"
+             x:Class="linear_programming_solver.Views.UserControls.CanonicalFormView"
+             x:DataType="vm:CanonicalFormViewModel">
+
+    <ScrollViewer Padding="20">
+        <StackPanel Spacing="25">
+            
+            <!-- Title -->
+            <Border Background="#4A90E2" 
+                    CornerRadius="5" 
+                    Padding="15,10">
+                <TextBlock Text="Canonical Form Conversion" 
+                          FontSize="24" 
+                          FontWeight="Bold" 
+                          Foreground="White" 
+                          HorizontalAlignment="Center" />
+            </Border>
+            
+            <!-- Problem Summary -->
+            <Border BorderBrush="#CCCCCC" 
+                    BorderThickness="1" 
+                    CornerRadius="5" 
+                    Padding="15">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0" Spacing="8">
+                        <TextBlock Text="Problem Information" 
+                                  FontSize="16" 
+                                  FontWeight="Bold" 
+                                  Foreground="#333333" />
+                        <TextBlock Text="{Binding ProblemType, StringFormat='Type: {0}'}" 
+                                  FontSize="12" />
+                        <TextBlock Text="{Binding OriginalVariableCount, StringFormat='Original Variables: {0}'}" 
+                                  FontSize="12" />
+                        <TextBlock Text="{Binding ConstraintCount, StringFormat='Constraints: {0}'}" 
+                                  FontSize="12" />
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="1" Spacing="8">
+                        <TextBlock Text="Canonical Form Information" 
+                                  FontSize="16" 
+                                  FontWeight="Bold" 
+                                  Foreground="#333333" />
+                        <TextBlock Text="{Binding TotalVariableCount, StringFormat='Total Variables: {0}'}" 
+                                  FontSize="12" />
+                        <TextBlock Text="{Binding SlackVariableCount, StringFormat='Slack Variables Added: {0}'}" 
+                                  FontSize="12" />
+                        <TextBlock Text="All variables ≥ 0" 
+                                  FontSize="12" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+            
+            <!-- Two Column Layout -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <!-- Left Column: Original Problem -->
+                <StackPanel Grid.Column="0" Spacing="15">
+                    <Border Background="#F8F9FA" 
+                            BorderBrush="#DEE2E6" 
+                            BorderThickness="1" 
+                            CornerRadius="5" 
+                            Padding="15">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Original Problem" 
+                                      FontSize="18" 
+                                      FontWeight="Bold" 
+                                      Foreground="#495057" />
+                            
+                            <ScrollViewer MaxHeight="300" 
+                                         VerticalScrollBarVisibility="Auto">
+                                <TextBox Text="{Binding OriginalProblemText}" 
+                                        IsReadOnly="True"
+                                        TextWrapping="Wrap"
+                                        FontFamily="Consolas,Monaco,monospace"
+                                        FontSize="11"
+                                        Background="White"
+                                        BorderThickness="0"
+                                        Padding="10" />
+                            </ScrollViewer>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+                
+                <!-- Right Column: Canonical Form -->
+                <StackPanel Grid.Column="2" Spacing="15">
+                    <Border Background="#E8F5E8" 
+                            BorderBrush="#28A745" 
+                            BorderThickness="1" 
+                            CornerRadius="5" 
+                            Padding="15">
+                        <StackPanel Spacing="15">
+                            <TextBlock Text="Canonical Form" 
+                                      FontSize="18" 
+                                      FontWeight="Bold" 
+                                      Foreground="#155724" />
+                            
+                            <!-- Summary -->
+                            <TextBox Text="{Binding CanonicalFormText}" 
+                                    IsReadOnly="True"
+                                    TextWrapping="Wrap"
+                                    FontFamily="Consolas,Monaco,monospace"
+                                    FontSize="11"
+                                    Background="White"
+                                    BorderThickness="1"
+                                    BorderBrush="#C3E6CB"
+                                    Padding="10" />
+                            
+                            <!-- Objective Function -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Objective Function:" 
+                                          FontWeight="Bold" 
+                                          FontSize="12" />
+                                <Border Background="White" 
+                                       BorderBrush="#C3E6CB" 
+                                       BorderThickness="1" 
+                                       CornerRadius="3" 
+                                       Padding="8">
+                                    <TextBlock Text="{Binding ObjectiveFunction}" 
+                                              FontFamily="Consolas,Monaco,monospace"
+                                              FontSize="11"
+                                              TextWrapping="Wrap" />
+                                </Border>
+                            </StackPanel>
+                            
+                            <!-- Constraints -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Constraints:" 
+                                          FontWeight="Bold" 
+                                          FontSize="12" />
+                                <Border Background="White" 
+                                       BorderBrush="#C3E6CB" 
+                                       BorderThickness="1" 
+                                       CornerRadius="3" 
+                                       MaxHeight="200">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                        <ListBox ItemsSource="{Binding Constraints}"
+                                                Background="Transparent"
+                                                BorderThickness="0">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding .}" 
+                                                              FontFamily="Consolas,Monaco,monospace"
+                                                              FontSize="10"
+                                                              Padding="5,2" />
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </ScrollViewer>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+            
+            <!-- Variable Mappings -->
+            <Border BorderBrush="#FFC107" 
+                    BorderThickness="2" 
+                    CornerRadius="5" 
+                    Padding="15"
+                    Background="#FFF3CD">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Variable Transformation Mappings" 
+                              FontSize="16" 
+                              FontWeight="Bold" 
+                              Foreground="#856404" />
+                    
+                    <DataGrid ItemsSource="{Binding VariableMappings}"
+                             AutoGenerateColumns="False"
+                             GridLinesVisibility="All"
+                             HeadersVisibility="Column"
+                             CanUserReorderColumns="False"
+                             CanUserResizeColumns="True"
+                             CanUserSortColumns="False"
+                             IsReadOnly="True"
+                             Background="White"
+                             MaxHeight="200">
+                        
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#FFC107" />
+                                <Setter Property="Foreground" Value="#212529" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            </Style>
+                        </DataGrid.Styles>
+                        
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Original Variable" 
+                                              Binding="{Binding OriginalVariable}"
+                                              Width="120" />
+                            <DataGridTextColumn Header="Canonical Variables" 
+                                              Binding="{Binding CanonicalVariables}"
+                                              Width="150" />
+                            <DataGridTextColumn Header="Type" 
+                                              Binding="{Binding VariableType}"
+                                              Width="100" />
+                            <DataGridTextColumn Header="Description" 
+                                              Binding="{Binding Description}"
+                                              Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+            
+            <!-- Instructions -->
+            <Border Background="#D1ECF1" 
+                    BorderBrush="#BEE5EB" 
+                    BorderThickness="1" 
+                    CornerRadius="5" 
+                    Padding="15">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Understanding Canonical Form" 
+                              FontSize="14" 
+                              FontWeight="Bold" 
+                              Foreground="#0C5460" />
+                    <TextBlock TextWrapping="Wrap" 
+                              FontSize="11" 
+                              Foreground="#0C5460">
+                        The canonical form is a standardized representation of the linear programming problem where:
+                        • All constraints are equality constraints (=)
+                        • All variables are non-negative (≥ 0)  
+                        • Slack variables are added to convert inequalities to equalities
+                        • Unrestricted variables are split into positive and negative parts
+                        This form is required by the simplex algorithm for solving the problem.
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+            
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -315,7 +315,81 @@ public class RevisedPrimalSimplexSolver
             iteration.Data["ReducedCosts"] = reducedCosts;
         }
         
+        // Convert to tableau display format for UI
+        CreateTableauRows(data, iteration);
+        
         return iteration;
+    }
+    
+    private void CreateTableauRows(RevisedSimplexData data, IterationData iteration)
+    {
+        int m = data.ConstraintCount;
+        int n = data.VariableCount;
+        
+        // Create variable column headers
+        for (int j = 0; j < n; j++)
+        {
+            iteration.VariableColumns.Add($"x{j + 1}");
+        }
+        iteration.VariableColumns.Add("RHS");
+        
+        // Create constraint rows from basic solution and basis inverse
+        for (int i = 0; i < m; i++)
+        {
+            var row = new TableauRow
+            {
+                BasisVariable = $"x{data.BasicVariables[i] + 1}",
+                Rhs = data.BasicSolution[i]
+            };
+            
+            // Calculate tableau coefficients: B^(-1) * A
+            for (int j = 0; j < n; j++)
+            {
+                double coefficient = 0;
+                for (int k = 0; k < m; k++)
+                {
+                    coefficient += data.BasisInverse[i, k] * data.A[k, j];
+                }
+                row.Coefficients.Add(coefficient);
+            }
+            
+            iteration.TableauRows.Add(row);
+        }
+        
+        // Add objective row (reduced costs)
+        var objRow = new TableauRow
+        {
+            BasisVariable = "Z",
+            Rhs = 0 // Calculate objective value
+        };
+        
+        // Calculate current objective value
+        double objValue = 0;
+        for (int i = 0; i < m; i++)
+        {
+            objValue += data.c[data.BasicVariables[i]] * data.BasicSolution[i];
+        }
+        objRow.Rhs = objValue;
+        
+        // Calculate reduced costs
+        if (iteration.Data.ContainsKey("ReducedCosts"))
+        {
+            var reducedCosts = (double[])iteration.Data["ReducedCosts"];
+            for (int j = 0; j < Math.Min(n, reducedCosts.Length); j++)
+            {
+                objRow.Coefficients.Add(reducedCosts[j]);
+            }
+        }
+        else
+        {
+            // For initial iteration, just use original costs
+            for (int j = 0; j < n; j++)
+            {
+                objRow.Coefficients.Add(data.c[j]);
+            }
+        }
+        
+        iteration.TableauRows.Add(objRow);
     }
 }
 

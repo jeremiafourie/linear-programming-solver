@@ -27,6 +27,9 @@
         <DataTemplate DataType="vm:TableauIterationsViewModel">
             <uc:TableauIterationsView />
         </DataTemplate>
+        <DataTemplate DataType="vm:CanonicalFormViewModel">
+            <uc:CanonicalFormView />
+        </DataTemplate>
     </Window.DataTemplates>
 
     <DockPanel>

@@ -222,7 +222,7 @@ public class PrimalSimplexSolver
         for (int i = 0; i < tableau.ConstraintCount; i++)
         {
             int basicVar = tableau.BasicVariables[i];
-            solution.Variables[basicVar] = tableau.Matrix[i, n];
+            solution.Variables[basicVar] = tableau.Matrix[i, tableau.VariableCount]; // RHS column
             solution.BasicVariables.Add(basicVar);
         }
         

@@ -45,6 +45,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public SolutionTableViewModel SolutionTableViewModel { get; }
     public IterationDiagramViewModel IterationDiagramViewModel { get; }
     public TableauIterationsViewModel TableauIterationsViewModel { get; }
+    public CanonicalFormViewModel CanonicalFormViewModel { get; }
 
     public MainWindowViewModel(Window window)
     {
@@ -56,6 +57,7 @@ public partial class MainWindowViewModel : ViewModelBase
         SolutionTableViewModel = new SolutionTableViewModel();
         IterationDiagramViewModel = new IterationDiagramViewModel();
         TableauIterationsViewModel = new TableauIterationsViewModel();
+        CanonicalFormViewModel = new CanonicalFormViewModel();
         
         // Start with Welcome view
         CurrentViewModel = WelcomeViewModel;
@@ -98,6 +100,20 @@ public partial class MainWindowViewModel : ViewModelBase
         else
         {
             StatusMessage = "No iteration data available. Please solve a problem first.";
+        }
+    }
+
+    public void NavigateToCanonicalForm()
+    {
+        if (CurrentSolution != null)
+        {
+            CanonicalFormViewModel.LoadCanonicalForm(CurrentSolution.OriginalProblem, CurrentSolution.CanonicalForm);
+            CurrentViewModel = CanonicalFormViewModel;
+            StatusMessage = "Canonical Form view";
+        }
+        else
+        {
+            StatusMessage = "No problem available. Please load or solve a problem first.";
         }
     }
 
@@ -599,8 +615,66 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
     
-    [RelayCommand] private void SolveDualProblem() { StatusMessage = "Solve Dual Problem clicked"; }
-    [RelayCommand] private void VerifyDualityType() { StatusMessage = "Verify Duality Type clicked"; }
+    [RelayCommand] 
+    private async Task SolveDualProblem() 
+    { 
+        if (CurrentSolution?.Success != true)
+        {
+            StatusMessage = "No problem available to solve dual";
+            return;
+        }
+
+        try
+        {
+            StatusMessage = "Generating and solving dual problem...";
+            
+            var dual = _sensitivityService.GenerateDualProblem(CurrentSolution.OriginalProblem);
+            var dualString = _sensitivityService.FormatDualProblem(dual);
+            
+            // Convert dual problem to LP format and solve
+            var dualSolution = await _solutionEngine.SolveAsync(dualString, SelectedAlgorithm);
+            
+            if (dualSolution.Success)
+            {
+                StatusMessage = $"Dual problem solved: {dualSolution.Solution.Status}, Objective: {dualSolution.Solution.ObjectiveValue:F3}";
+                
+                // Show dual solution in dialog
+                var resultViewModel = new SensitivityResultDialogViewModel();
+                resultViewModel.ShowDualSolutionAnalysis(CurrentSolution, dualSolution);
+                await _dialogService.ShowSensitivityResultDialogAsync(resultViewModel, _window);
+            }
+            else
+            {
+                StatusMessage = $"Failed to solve dual problem: {dualSolution.ErrorMessage}";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error solving dual problem: {ex.Message}";
+        }
+    }
+    
+    [RelayCommand] 
+    private void VerifyDualityType() 
+    { 
+        if (CurrentSolution?.Success != true)
+        {
+            StatusMessage = "No problem available to verify duality";
+            return;
+        }
+        
+        try
+        {
+            var dualityType = _sensitivityService.VerifyDualityType(CurrentSolution);
+            StatusMessage = $"Duality verification: {dualityType}";
+            
+            // Could show detailed analysis in dialog
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error verifying duality: {ex.Message}";
+        }
+    }
 
     #endregion
 
@@ -608,7 +682,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [RelayCommand] private void SolutionTable() { NavigateToSolutionTable(); }
     [RelayCommand] private void TableauIterations() { NavigateToTableauIterations(); }
-    [RelayCommand] private void CanonicalForm() { StatusMessage = "Canonical Form view clicked"; }
+    [RelayCommand] private void CanonicalForm() { NavigateToCanonicalForm(); }
     [RelayCommand] private void FullScreen() { StatusMessage = "Full Screen toggled"; }
     [RelayCommand] private void StatusBar() { StatusMessage = "Status Bar toggled"; }
 

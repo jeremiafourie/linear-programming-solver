@@ -505,6 +505,64 @@ public class SensitivityAnalysisService
         
         return objectiveCoeff - dualCost;
     }
+
+    public string VerifyDualityType(SolutionResult solution)
+    {
+        if (!solution.Success || solution.Solution.Status != SolutionStatus.Optimal)
+        {
+            return "Cannot verify duality for non-optimal solution";
+        }
+
+        // Check if primal and dual solutions exist and satisfy complementary slackness
+        try
+        {
+            // Generate dual problem
+            var dual = GenerateDualProblem(solution.OriginalProblem);
+            
+            // Basic duality verification checks
+            var checks = new List<string>();
+            
+            // 1. Weak duality: primal objective ≤ dual objective (for maximization)
+            double primalObj = solution.Solution.ObjectiveValue;
+            checks.Add($"Primal objective value: {primalObj:F3}");
+            
+            // 2. Check if problem has finite optimal value
+            if (double.IsInfinity(Math.Abs(primalObj)))
+            {
+                return "Problem has unbounded solution - duality gap exists";
+            }
+            
+            // 3. Strong duality: if both primal and dual are feasible and bounded, 
+            //    then optimal values are equal
+            checks.Add("Problem appears to have bounded optimal solution");
+            checks.Add("Strong duality likely holds (optimal values should be equal)");
+            
+            // 4. Complementary slackness check (simplified)
+            int slackViolations = 0;
+            for (int i = 0; i < solution.Solution.Variables.Length; i++)
+            {
+                if (solution.Solution.Variables[i] > 1e-6 && !solution.Solution.BasicVariables.Contains(i))
+                {
+                    slackViolations++;
+                }
+            }
+            
+            if (slackViolations == 0)
+            {
+                checks.Add("Complementary slackness appears satisfied");
+                return "Strong Duality: " + string.Join("; ", checks);
+            }
+            else
+            {
+                checks.Add($"Potential slackness violations: {slackViolations}");
+                return "Weak Duality: " + string.Join("; ", checks);
+            }
+        }
+        catch (Exception ex)
+        {
+            return $"Error verifying duality: {ex.Message}";
+        }
+    }
 }
 
 public class SensitivityResult

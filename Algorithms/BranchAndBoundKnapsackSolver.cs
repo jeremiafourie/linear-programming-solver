@@ -308,12 +308,13 @@ public class BranchAndBoundKnapsackSolver
 
     private IterationData CreateIterationData(int iteration, string description, KnapsackProblem knapsack)
     {
-        return new IterationData
+        var iterationData = new IterationData
         {
             IterationNumber = iteration,
             AlgorithmType = "Branch & Bound Knapsack",
             Description = description,
             Status = "In Progress",
+            NodeType = "Knapsack",
             Data = new Dictionary<string, object>
             {
                 ["ItemCount"] = knapsack.ItemCount,
@@ -322,6 +323,46 @@ public class BranchAndBoundKnapsackSolver
                 ["Weights"] = knapsack.Weights
             }
         };
+        
+        // Create knapsack-specific tableau display
+        CreateKnapsackDisplay(knapsack, iterationData);
+        
+        return iterationData;
+    }
+    
+    private void CreateKnapsackDisplay(KnapsackProblem knapsack, IterationData iterationData)
+    {
+        iterationData.VariableColumns.Add("Item");
+        iterationData.VariableColumns.Add("Value");
+        iterationData.VariableColumns.Add("Weight");
+        iterationData.VariableColumns.Add("Efficiency");
+        
+        for (int i = 0; i < knapsack.ItemCount; i++)
+        {
+            var row = new TableauRow
+            {
+                BasisVariable = $"Item {i + 1}",
+                Rhs = knapsack.Values[i]
+            };
+            
+            row.Coefficients.Add(knapsack.Values[i]);
+            row.Coefficients.Add(knapsack.Weights[i]);
+            row.Coefficients.Add(knapsack.Values[i] / knapsack.Weights[i]); // Efficiency ratio
+            
+            iterationData.TableauRows.Add(row);
+        }
+        
+        // Add capacity row
+        var capacityRow = new TableauRow
+        {
+            BasisVariable = "Capacity",
+            Rhs = knapsack.Capacity
+        };
+        capacityRow.Coefficients.Add(0);
+        capacityRow.Coefficients.Add(knapsack.Capacity);
+        capacityRow.Coefficients.Add(0);
+        
+        iterationData.TableauRows.Add(capacityRow);
     }
 }
 

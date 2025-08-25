@@ -1,8 +1,10 @@
+using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Avalonia.Media;
 using linear_programming_solver.Services;
+using linear_programming_solver.Models;
 
 namespace linear_programming_solver.ViewModels.Dialogs;
 
@@ -136,6 +138,51 @@ public partial class SensitivityResultDialogViewModel : BaseDialogViewModel
         DetailedDescription = "Shadow prices represent the marginal value of relaxing each constraint by one unit. " +
                              "A positive shadow price indicates that increasing the RHS of that constraint would improve " +
                              "the objective function value. A zero shadow price means the constraint is not binding.";
+    }
+
+    public void ShowDualSolutionAnalysis(SolutionResult primalSolution, SolutionResult dualSolution)
+    {
+        AnalysisType = "Dual Problem Analysis";
+        VariableName = "Primal vs Dual Comparison";
+        
+        if (dualSolution.Success)
+        {
+            Status = "Dual problem solved successfully";
+            StatusColor = Brushes.Green;
+            
+            CurrentValue = primalSolution.Solution.ObjectiveValue;
+            NewValue = dualSolution.Solution.ObjectiveValue;
+            ObjectiveChange = Math.Abs(NewValue - CurrentValue);
+            
+            ShowImpactAnalysis = true;
+            
+            // Check duality gap
+            double gap = Math.Abs(CurrentValue - NewValue);
+            if (gap < 1e-6)
+            {
+                DetailedDescription = $"Strong Duality Verified: Primal objective = {CurrentValue:F6}, " +
+                                    $"Dual objective = {NewValue:F6}, Gap = {gap:E6}. " +
+                                    $"The duality gap is essentially zero, confirming strong duality.";
+            }
+            else
+            {
+                DetailedDescription = $"Duality Gap Found: Primal objective = {CurrentValue:F6}, " +
+                                    $"Dual objective = {NewValue:F6}, Gap = {gap:F6}. " +
+                                    $"This gap may indicate numerical errors or weak duality.";
+            }
+        }
+        else
+        {
+            Status = "Failed to solve dual problem";
+            StatusColor = Brushes.Red;
+            DetailedDescription = $"Dual problem could not be solved: {dualSolution.ErrorMessage}";
+        }
+        
+        // Add additional analysis data
+        ShowRange = true;
+        LowerBound = Math.Min(CurrentValue, NewValue);
+        UpperBound = Math.Max(CurrentValue, NewValue);
+        RangeSize = Math.Abs(UpperBound - LowerBound);
     }
 
     [RelayCommand]

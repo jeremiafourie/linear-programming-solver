@@ -272,7 +272,8 @@ public class BranchAndBoundSimplexSolver
             Description = description,
             Status = node.Status.ToString(),
             IsOptimal = node.Status == NodeStatus.IntegerSolution,
-            IsFinal = node.Status == NodeStatus.Fathomed || node.Status == NodeStatus.IntegerSolution
+            IsFinal = node.Status == NodeStatus.Fathomed || node.Status == NodeStatus.IntegerSolution,
+            NodeType = "Branch"
         };
 
         // Store node information
@@ -280,13 +281,98 @@ public class BranchAndBoundSimplexSolver
         iterationData.Data["NodeStatus"] = node.Status;
         iterationData.Data["BranchingConstraint"] = node.BranchingConstraint ?? "";
         
-        if (node.LpSolution != null)
+        if (node.LpSolution != null && node.LpSolution.Status == SolutionStatus.Optimal)
         {
             iterationData.Data["LPObjectiveValue"] = node.LpSolution.ObjectiveValue;
             iterationData.Data["LPVariables"] = node.LpSolution.Variables;
+            
+            // Create tableau display from LP solution iterations if available
+            if (node.LpSolution.Iterations.Count > 0)
+            {
+                var lastIteration = node.LpSolution.Iterations.Last();
+                
+                // Copy tableau data from the LP solution
+                foreach (var col in lastIteration.VariableColumns)
+                {
+                    iterationData.VariableColumns.Add(col);
+                }
+                
+                foreach (var row in lastIteration.TableauRows)
+                {
+                    var newRow = new TableauRow
+                    {
+                        BasisVariable = row.BasisVariable,
+                        Rhs = row.Rhs
+                    };
+                    foreach (var coeff in row.Coefficients)
+                    {
+                        newRow.Coefficients.Add(coeff);
+                    }
+                    iterationData.TableauRows.Add(newRow);
+                }
+            }
+            else
+            {
+                // Create simplified display showing variable values
+                CreateBranchNodeDisplay(node, iterationData);
+            }
+        }
+        else
+        {
+            // Create simplified display for infeasible/fathomed nodes
+            CreateBranchNodeDisplay(node, iterationData);
         }
 
         return iterationData;
+    }
+    
+    private void CreateBranchNodeDisplay(BranchAndBoundNode node, IterationData iterationData)
+    {
+        // Create a simplified display for branch and bound nodes
+        iterationData.VariableColumns.Add("Variable");
+        iterationData.VariableColumns.Add("Value");
+        iterationData.VariableColumns.Add("Status");
+        
+        if (node.LpSolution?.Variables != null)
+        {
+            for (int i = 0; i < Math.Min(6, node.LpSolution.Variables.Length); i++) // Show first 6 variables
+            {
+                var row = new TableauRow
+                {
+                    BasisVariable = $"x{i + 1}",
+                    Rhs = 0
+                };
+                
+                row.Coefficients.Add(node.LpSolution.Variables[i]);
+                row.Coefficients.Add(node.LpSolution.Variables[i]); // Duplicate for display
+                
+                string status = "Continuous";
+                if (node.Problem.VariableMap.Count > i)
+                {
+                    var mapping = node.Problem.VariableMap[i];
+                    if (mapping.OriginalType == VariableType.Integer)
+                        status = Math.Abs(node.LpSolution.Variables[i] - Math.Round(node.LpSolution.Variables[i])) < EPSILON ? "Integer" : "Fractional";
+                    else if (mapping.OriginalType == VariableType.Binary)
+                        status = (Math.Abs(node.LpSolution.Variables[i]) < EPSILON || Math.Abs(node.LpSolution.Variables[i] - 1) < EPSILON) ? "Binary" : "Fractional";
+                }
+                
+                row.Coefficients.Add(status == "Integer" ? 1.0 : (status == "Binary" ? 2.0 : 0.0)); // Encode status as number
+                
+                iterationData.TableauRows.Add(row);
+            }
+        }
+        
+        // Add summary row
+        var summaryRow = new TableauRow
+        {
+            BasisVariable = "Objective",
+            Rhs = node.LpSolution?.ObjectiveValue ?? 0
+        };
+        summaryRow.Coefficients.Add(node.LpSolution?.ObjectiveValue ?? 0);
+        summaryRow.Coefficients.Add(0); // Placeholder
+        summaryRow.Coefficients.Add(node.Status == NodeStatus.IntegerSolution ? 3.0 : 0.0); // Status encoding
+        
+        iterationData.TableauRows.Add(summaryRow);
     }
 }
 
